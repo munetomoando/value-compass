@@ -130,7 +130,8 @@ async function handleExport(url, env) {
 
 function csvEscape(val) {
   if (val === null || val === undefined) return "";
-  const s = String(val);
+  let s = String(val);
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; // 表計算ソフトの数式インジェクション対策
   if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
   return s;
 }
@@ -157,7 +158,7 @@ function toCsv(records) {
       ...ATTR_ORDER.filter(a => a !== "income").map(a => (r.estimate && r.estimate.mrs_manyen && a in r.estimate.mrs_manyen) ? r.estimate.mrs_manyen[a] : ""),
       (r.decisive && r.decisive.most_hesitated_qid) || "",
       (r.decisive && r.decisive.fastest_qid) || "",
-      (r.quality && r.quality.logit_count_divergence != null) ? r.quality.logit_count_divergence : "",
+      (quality.logit_count_divergence != null) ? quality.logit_count_divergence : "",
       quality.dominant_passed, quality.min_response_ms, quality.consistency_flags,
       feedback.agreement, feedback.free_text,
       JSON.stringify(r.answers || [])
