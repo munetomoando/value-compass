@@ -141,8 +141,6 @@ button { font-family: inherit; cursor: pointer; }
 #quality-note { display: none; background: #fdeede; color: var(--warn); padding: 10px 14px;
   border-radius: 8px; font-size: 13px; margin-top: 12px; }
 
-.reveal-box { background: #eaf1ff; border-radius: 10px; padding: 16px; margin-top: 12px; font-size: 14px; display: none; }
-.link-btn { background: none; border: none; color: var(--accent); text-decoration: underline; padding: 0; font-size: 14px; }
 
 /* 確認画面 */
 .likert { display: flex; justify-content: space-between; gap: 6px; margin: 12px 0 6px; }
