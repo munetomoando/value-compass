@@ -5,7 +5,7 @@ compatibility_date = "2026-01-01"
 
 # CORS で許可する GitHub Pages のオリジン（自分の公開URLに置き換える）
 [vars]
-ALLOWED_ORIGIN = "https://<your-github-username>.github.io"
+ALLOWED_ORIGIN = "https://munetomoando.github.io"
 
 # 回答ログ保存用 KV namespace。
 # 事前に作成してから id を貼る:
@@ -13,8 +13,8 @@ ALLOWED_ORIGIN = "https://<your-github-username>.github.io"
 #   wrangler kv namespace create LOGS --preview
 [[kv_namespaces]]
 binding = "LOGS"
-id = "<your-kv-namespace-id>"
-preview_id = "<your-kv-preview-namespace-id>"
+id = "c5bf6d8e591c4297a01ba3d113f9e4bd"
+preview_id = "1eabe048ddb04648b4280029d095d9d8"
 
 # EXPORT_TOKEN は secret として登録（toml には書かない）:
 #   wrangler secret put EXPORT_TOKEN
