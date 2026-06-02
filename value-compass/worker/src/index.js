@@ -131,7 +131,9 @@ async function handleExport(url, env) {
 function csvEscape(val) {
   if (val === null || val === undefined) return "";
   let s = String(val);
-  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; // 表計算ソフトの数式インジェクション対策
+  // 表計算ソフトの数式インジェクション対策。ただし負の数値(-15, -0.25等)は数値として残す
+  const isNumber = /^-?\d+(\.\d+)?$/.test(s);
+  if (!isNumber && /^[=+\-@\t\r]/.test(s)) s = "'" + s;
   if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
   return s;
 }
