@@ -30,3 +30,13 @@ test("MRSは万円・有限、年収軽視時はnull化を考慮", () => {
     assert.ok(v===null || (Number.isFinite(v) && Math.abs(v)<=500), `${k}=${v}`);
   }
 });
+
+test("決定的瞬間と品質を返す", () => {
+  // 1問だけ極端に長い応答時間にして「最も悩んだ」に出るか
+  const ans2 = answers.map((a,i)=> i===3 ? {...a, response_ms:30000} : {...a, response_ms:3000});
+  const r = E.estimate(data.questions, data.meta, ans2);
+  const ex = E.extras(data.questions, data.meta, ans2, r);
+  assert.ok(ex.decisive.most_hesitated_qid, "悩んだ設問IDがある");
+  assert.equal(typeof ex.quality.dominant_passed, "boolean");
+  assert.ok(ex.verbal.keep.length>=1 && ex.verbal.tradeable.length>=1);
+});
