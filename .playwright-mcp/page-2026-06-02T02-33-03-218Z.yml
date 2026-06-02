@@ -1,0 +1,32 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]: VALUE COMPASS
+    - heading "価値観コンパス" [level=1] [ref=e4]
+    - paragraph [ref=e5]: 求人の二択から、あなたが大切にする働き方を読み解きます
+  - main [ref=e6]:
+    - generic [ref=e217]:
+      - heading "結果の確認" [level=2] [ref=e218]
+      - generic [ref=e219]:
+        - generic [ref=e220]: この結果はあなたの実感に合っていますか？
+        - generic [ref=e221]:
+          - generic [ref=e222] [cursor=pointer]:
+            - radio "1" [ref=e223]
+            - text: "1"
+          - generic [ref=e224] [cursor=pointer]:
+            - radio "2" [ref=e225]
+            - text: "2"
+          - generic [ref=e226] [cursor=pointer]:
+            - radio "3" [checked] [ref=e227]
+            - text: "3"
+          - generic [ref=e228] [cursor=pointer]:
+            - radio "4" [ref=e229]
+            - text: "4"
+          - generic [ref=e230] [cursor=pointer]:
+            - radio "5" [ref=e231]
+            - text: "5"
+        - generic [ref=e232]: 全く違うとても合う
+        - generic [ref=e233]: 結果を見て気づいたことがあれば（任意）
+        - textbox "結果を見て気づいたことがあれば（任意）" [ref=e234]:
+          - /placeholder: 例：残業を気にしていたんだと気づいた
+        - button "回答を送信する" [ref=e236] [cursor=pointer]
+    - generic [ref=e21]: 価値観コンパス / ValueCompass — MVP v0.1 ｜ 安藤至大 (Munetomo Ando)

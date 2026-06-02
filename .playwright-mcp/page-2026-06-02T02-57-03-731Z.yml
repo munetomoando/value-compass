@@ -1,0 +1,26 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]: VALUE COMPASS
+    - heading "価値観コンパス" [level=1] [ref=e4]
+    - paragraph [ref=e5]: 求人の二択から、あなたが大切にする働き方を読み解きます
+  - main [ref=e6]:
+    - generic [ref=e8]:
+      - heading "はじめに" [level=2] [ref=e9]
+      - paragraph [ref=e10]:
+        - text: これは、2つの仮想的な求人「A / B」のどちらで働きたいかを
+        - strong [ref=e11]: 12回
+        - text: 選んでいくアプリです。年収・勤務地・労働時間・在宅・裁量・安定性などの条件が同時に変わるので、「総合的にどちらがマシか」で選んでください。
+      - paragraph [ref=e12]:
+        - text: あなたの選択の積み重ねから、
+        - strong [ref=e13]: どの条件を重視しているか
+        - text: を推定して言葉でお返しします。所要時間は約3〜6分です。
+      - list [ref=e14]:
+        - listitem [ref=e15]:
+          - text: 回答は
+          - strong [ref=e16]: 匿名
+          - text: です。氏名・学籍番号など個人を特定する情報は取得しません。
+        - listitem [ref=e17]: 本アプリは機能改善のため、匿名の回答を分析することがあります。
+        - listitem [ref=e18]:
+          - strong [ref=e19]: 成績には一切影響しません。
+      - button "同意して始める" [ref=e20] [cursor=pointer]
+    - generic [ref=e21]: 価値観コンパス / ValueCompass — MVP v0.1 ｜ 安藤至大 (Munetomo Ando)

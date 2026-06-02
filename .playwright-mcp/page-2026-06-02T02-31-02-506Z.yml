@@ -1,0 +1,55 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]: VALUE COMPASS
+    - heading "価値観コンパス" [level=1] [ref=e4]
+    - paragraph [ref=e5]: 求人の二択から、あなたが大切にする働き方を読み解きます
+  - main [ref=e6]:
+    - generic [ref=e22]:
+      - generic [ref=e25]: 練習（集計対象外）
+      - heading "まずは練習です。どちらの求人で働きたいですか？" [level=2] [ref=e26]
+      - generic [ref=e27]:
+        - button "求人 A 年収 年収450万 勤務地・転勤 転勤なし・地元 労働時間 残業少（〜月10h） 在宅勤務 在宅可 成長・裁量 言われた業務中心 雇用安定性 安定（大手・終身的） これで働く" [ref=e28] [cursor=pointer]:
+          - heading "求人 A" [level=3] [ref=e29]
+          - list [ref=e30]:
+            - listitem [ref=e31]:
+              - generic [ref=e32]: 年収
+              - generic [ref=e33]: 年収450万
+            - listitem [ref=e34]:
+              - generic [ref=e35]: 勤務地・転勤
+              - generic [ref=e36]: 転勤なし・地元
+            - listitem [ref=e37]:
+              - generic [ref=e38]: 労働時間
+              - generic [ref=e39]: 残業少（〜月10h）
+            - listitem [ref=e40]:
+              - generic [ref=e41]: 在宅勤務
+              - generic [ref=e42]: 在宅可
+            - listitem [ref=e43]:
+              - generic [ref=e44]: 成長・裁量
+              - generic [ref=e45]: 言われた業務中心
+            - listitem [ref=e46]:
+              - generic [ref=e47]: 雇用安定性
+              - generic [ref=e48]: 安定（大手・終身的）
+          - generic [ref=e49]: これで働く
+        - button "求人 B 年収 年収450万 勤務地・転勤 転勤あり・全国 労働時間 残業多（〜月45h） 在宅勤務 出社のみ 成長・裁量 裁量大・成長機会多 雇用安定性 成長ベンチャー（不安定） これで働く" [ref=e50] [cursor=pointer]:
+          - heading "求人 B" [level=3] [ref=e51]
+          - list [ref=e52]:
+            - listitem [ref=e53]:
+              - generic [ref=e54]: 年収
+              - generic [ref=e55]: 年収450万
+            - listitem [ref=e56]:
+              - generic [ref=e57]: 勤務地・転勤
+              - generic [ref=e58]: 転勤あり・全国
+            - listitem [ref=e59]:
+              - generic [ref=e60]: 労働時間
+              - generic [ref=e61]: 残業多（〜月45h）
+            - listitem [ref=e62]:
+              - generic [ref=e63]: 在宅勤務
+              - generic [ref=e64]: 出社のみ
+            - listitem [ref=e65]:
+              - generic [ref=e66]: 成長・裁量
+              - generic [ref=e67]: 裁量大・成長機会多
+            - listitem [ref=e68]:
+              - generic [ref=e69]: 雇用安定性
+              - generic [ref=e70]: 成長ベンチャー（不安定）
+          - generic [ref=e71]: これで働く
+    - generic [ref=e21]: 価値観コンパス / ValueCompass — MVP v0.1 ｜ 安藤至大 (Munetomo Ando)

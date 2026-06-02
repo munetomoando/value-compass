@@ -1,0 +1,11 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]: VALUE COMPASS
+    - heading "価値観コンパス" [level=1] [ref=e4]
+    - paragraph [ref=e5]: 求人の二択から、あなたが大切にする働き方を読み解きます
+  - main [ref=e6]:
+    - generic [ref=e238]:
+      - heading "ありがとうございました" [level=2] [ref=e239]
+      - paragraph [ref=e240]: ご協力に感謝します。あなたの回答は今後の改善に役立てられます。
+      - paragraph [ref=e241]: （ローカル完結モード：回答はサーバへ送信していません）
+    - generic [ref=e21]: 価値観コンパス / ValueCompass — MVP v0.1 ｜ 安藤至大 (Munetomo Ando)

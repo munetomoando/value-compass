@@ -1,0 +1,2 @@
+[      93ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8753/favicon.ico:0
+[  172692ms] [LOG] ValueCompass payload: {session_id: f09431c2-f328-4337-afe6-b291d1a4feac, timestamp: 2026-06-02T02:33:08.195Z, answers: Array(12), scores: Object, quality: Object} @ http://localhost:8753/app.js:209

@@ -1,0 +1,26 @@
+# Wrangler 4 設定 — 価値観コンパス 回答ログAPI（設計書 §8.2, §11）
+name = "value-compass"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+# CORS で許可する GitHub Pages のオリジン（自分の公開URLに置き換える）
+[vars]
+ALLOWED_ORIGIN = "https://<your-github-username>.github.io"
+
+# 回答ログ保存用 KV namespace。
+# 事前に作成してから id を貼る:
+#   wrangler kv namespace create LOGS
+#   wrangler kv namespace create LOGS --preview
+[[kv_namespaces]]
+binding = "LOGS"
+id = "<your-kv-namespace-id>"
+preview_id = "<your-kv-preview-namespace-id>"
+
+# EXPORT_TOKEN は secret として登録（toml には書かない）:
+#   wrangler secret put EXPORT_TOKEN
+#
+# デプロイ:
+#   wrangler deploy
+#
+# ローカル実行:
+#   wrangler dev
