@@ -109,5 +109,61 @@
            };
   }
 
-  return { fitLogit, solve, estimate, designRow, code };
+  function zscores(arr){
+    const m=arr.reduce((a,b)=>a+b,0)/arr.length;
+    const sd=std(arr)||1e-9;
+    return arr.map(x=>(x-m)/sd);
+  }
+
+  // 決定的瞬間＋品質＋言語化（estimateの結果estを使う）
+  function extras(questions, meta, answers, est){
+    const ansById={}; answers.forEach(a=>ansById[a.q_id]=a);
+    const mains = questions.filter(q=>q.scored);
+    // 本人の効用での僅差度 |β·d|
+    const ids=[], gaps=[], times=[];
+    mains.forEach(q=>{
+      const a=ansById[q.id]; if(!a) return;
+      const d=designRow(meta,q);
+      let u=0; meta.attribute_order.forEach((attr,i)=> u+=est.beta[attr]*d[i]);
+      ids.push(q.id); gaps.push(Math.abs(u)); times.push(a.response_ms||0);
+    });
+    const zg=zscores(gaps), zt=zscores(times);
+    let hi=0, lo=0;
+    ids.forEach((_,i)=>{ if((zt[i]-zg[i])>(zt[hi]-zg[hi])) hi=i; if((zg[i]-zt[i])>(zg[lo]-zt[lo])) lo=i; });
+    const decisive = { most_hesitated_qid: ids[hi]||null, fastest_qid: ids[lo]||null };
+
+    // 品質：支配選択passed、最小応答時間、ロジット×カウント乖離
+    const dom = questions.find(q=>q.type==="dominant");
+    const dominant_passed = dom && ansById[dom.id] ? ansById[dom.id].choice==="A" : true;
+    const allTimes = answers.map(a=>a.response_ms).filter(t=>typeof t==="number");
+    const min_response_ms = allTimes.length?Math.min(...allTimes):null;
+    // カウントベース順位（v0.1方式）との乖離
+    const counts={}; meta.attribute_order.forEach(attr=>{
+      let rel=0,good=0;
+      mains.forEach(q=>{ if(q.A[attr]===q.B[attr])return; rel++;
+        const a=ansById[q.id]; if(!a)return;
+        const bs = attr==="income" ? (+q.A.income>=+q.B.income?"A":"B")
+          : (q.A[attr]===(meta.attributes[attr].good||meta.attributes[attr].good_nominal)?"A":"B");
+        if(a.choice===bs) good++; });
+      counts[attr]= rel?good/rel:0.5;
+    });
+    const cRank=meta.attribute_order.slice().sort((p,q)=>Math.abs(counts[q]-0.5)-Math.abs(counts[p]-0.5));
+    let div=0; est.importance_rank.forEach((a,i)=> div+=Math.abs(i-cRank.indexOf(a)));
+    const logit_count_divergence = +(div/(meta.attribute_order.length*meta.attribute_order.length)).toFixed(2);
+
+    // 言語化：上位2=譲れない、下位2=出しやすい
+    const label={income:"年収",location:"勤務地（転勤の少なさ）",hours:"労働時間の短さ",remote:"在宅勤務",growth:"裁量・成長機会",stability:"雇用の安定性"};
+    const dir={};
+    if(Number.isFinite(est.beta.growth)) dir.growth = est.beta.growth>=0?"裁量・成長を取りにいく傾向":"言われた業務でも安定を選ぶ傾向";
+    if(Number.isFinite(est.beta.stability)) dir.stability = est.beta.stability>=0?"雇用の安定を重視する傾向":"不安定でも成長機会を取る傾向";
+    const ranked=est.importance_rank;
+    const phrase=a=> (a==="growth"&&dir.growth)?`${label[a]}（${dir.growth}）`:(a==="stability"&&dir.stability)?`${label[a]}（${dir.stability}）`:label[a];
+    const keep=ranked.slice(0,2).map(phrase);
+    const tradeable=ranked.slice(-2).map(phrase);
+    const text=`あなたの選択からは、**${phrase(ranked[0])}**と**${phrase(ranked[1])}**を特に重視する傾向が読み取れました。一方で**${label[ranked[ranked.length-1]]}**は相対的に優先度が低く、他条件と引き換えに手放す選択が目立ちました。`;
+
+    return { decisive, quality:{ dominant_passed, min_response_ms, logit_count_divergence }, counts, verbal:{ text, keep, tradeable, direction:dir, label } };
+  }
+
+  return { fitLogit, solve, estimate, extras, designRow, code };
 });
