@@ -1,33 +1,44 @@
-# 価値観コンパス / ValueCompass — MVP v0.1
+# 価値観コンパス / ValueCompass — v0.2「めくって発見」
 
-DCE（離散選択実験）型の自己理解アプリ。求人の二択を繰り返し選ばせ、各労働条件への
-相対的な重視度を選択ログから逆算して言語化する。設計書 `../design_dce_career_app.md` に準拠。
+DCE（離散選択実験）型の自己理解アプリ。求人の二択を繰り返し選ばせ、各労働条件への選好を
+選択ログから逆算する。v0.2では、進行中は事実のトレードオフのみ提示し、最後に「めくって発見」で
+重視度レーダー・お金換算（限界代替率）・決定的だった瞬間を1枚ずつ開いて返す。
 
+設計書: `../design_dce_career_app.md`（MVP）／`../20260602価値観コンパス_発見体験設計.md`（v0.2）
 著者: 安藤至大 (Munetomo Ando)
 
 ## 構成
 
 ```
 value-compass/
-├── frontend/            # GitHub Pages 配信対象（フロント完結で全画面が動く）
-│   ├── index.html       # 画面遷移の本体（導入→練習→本番→結果→確認→完了）
-│   ├── app.js           # 設問進行・応答時間計測・送信
-│   ├── questions.json   # 12問のDCEデザイン（設計書 §5.5 確定版）
-│   ├── estimate.js      # カウントベース推定・品質チェック・言語化（§6, §7）
-│   └── style.css
-└── worker/              # Cloudflare Workers（バックエンド：今回は未実装、次ステップ）
-    └── src/
+├── frontend/               # GitHub Pages 配信対象（フロント完結で全画面が動く）
+│   ├── index.html          # 画面遷移（導入→練習→案内→本番16→結果リビール→確認→完了）
+│   ├── app.js              # 設問進行・順序ランダム化・進行中トレードオフ・結果リビール制御・送信
+│   ├── questions.json      # 16問のDCEデザイン＋メタ（生成物）
+│   ├── build-questions.mjs # 設問の決定論的生成＋バランス検証スクリプト
+│   ├── estimate.js         # ロジット推定(IRLS+リッジ)・MRS・決定的瞬間・カウント整合・言語化
+│   ├── radar.js            # レーダーチャート（SVG）描画
+│   ├── style.css
+│   └── test/               # node:test による単体テスト
+└── worker/                 # Cloudflare Workers（回答ログAPI）
+    ├── src/index.js        # POST /api/submit（KV保存）・GET /api/export（CSV, トークン保護）
+    └── wrangler.toml
 ```
 
-## 現状（このコミットで完成している範囲）
+## 完成している範囲（v0.2）
 
-- **フロント完結版**：バックエンド無しで導入→練習1→本番10→支配選択1→結果→確認→完了まで
-  すべて動作。推定はクライアント側で完結するため、サーバが無くても結果表示は成立する。
-- 設問データの分岐回数を検証済み（全6属性で6〜10問の分岐を確保。支配選択q7はAが全属性優位）。
+- **フロント完結**：バックエンド無しで 導入→練習1→案内→本番16（注意チェック1問を中盤に紛れ込ませ）→
+  結果リビール5枚→確認→完了 まで動作。推定はクライアント側で完結する。
+- **推定**：2択を差分の二項ロジット（条件付きロジット）で罰則付き最尤推定（IRLS＋リッジ）。
+  少観測・完全分離でも有限に安定。年収を基準財に MRS（お金換算, 万円）を算出（β_income≦0 の場合は
+  「換算を省略」と表示）。重視度はスケール非依存指標 `|β|×sd(差分)` をレーダーで可視化。
+- **設問**：`income` は4水準（300/450/600/750万・30歳頃の額面）、提示順はセッション毎ランダム化。
+  `build-questions.mjs` が分岐回数・水準分布・支配ペア不在を満たすまで決定論生成し検証する。
+- **匿名方針**：個人識別情報は取得しない（設計書 §9.2 踏襲）。
 
 ## ローカルでの動作確認
 
-`file://` で直接開くと `fetch(questions.json)` がブロックされるため、簡易サーバ経由で開く:
+`file://` 直開きは `fetch(questions.json)` がブロックされるため、簡易サーバ経由で開く:
 
 ```bash
 cd frontend
@@ -35,17 +46,26 @@ python3 -m http.server 8000
 # ブラウザで http://localhost:8000/ を開く
 ```
 
-## バックエンド送信を有効にする（次ステップ）
+## テスト
 
-`frontend/app.js` 冒頭の `SUBMIT_ENDPOINT` を空文字のままにすると「ローカル完結モード」で
-動作し、回答はサーバへ送信されない（コンソールに payload を出力）。
-Cloudflare Worker（`/api/submit`）をデプロイ後、その URL を `SUBMIT_ENDPOINT` に設定すると
-回答ログが送信される。Worker 側（KV保存・CORS・`/api/export`）は設計書 §8 に基づき次ステップで実装する。
+zero-dependency。Node.js（v18+）の組み込みテストランナーを使用:
 
-## 推定ロジックの要点（estimate.js）
+```bash
+cd frontend
+node --test test/questions.test.mjs test/logit.test.mjs test/estimate.test.mjs test/radar.test.mjs
+```
 
-- 各属性の「分岐設問のうち良い水準側を選んだ割合」を `score` (0〜1) として記録。
-- 重視度ランキングは選択の一貫性 `|score - 0.5| × 2` を使用（常に守った／常に手放した属性ほど判断軸とみなす）。
-- 裁量(`growth`)・安定(`stability`)は「良い水準」に個人差があるため、名目 good 側の割合を
-  記録しつつ、どちらに振れたかを方向ラベルとして返す（設計書 §5.5）。
-- 支配選択 q7 で良い側(A)を選ばなければ品質フラグを立てる。
+設問を作り直す場合（シード固定で決定論的に再生成）:
+
+```bash
+cd frontend
+node build-questions.mjs   # questions.json を再生成
+```
+
+## バックエンド送信を有効にする
+
+`frontend/app.js` 冒頭の `SUBMIT_ENDPOINT` が空文字なら「ローカル完結モード」で、回答はサーバへ
+送信されずコンソールに payload を出力する。Cloudflare Worker（`/api/submit`）をデプロイ後、その URL を
+`SUBMIT_ENDPOINT` に設定すると回答ログが送信される。デプロイ手順は `worker/wrangler.toml` のコメント参照
+（KV作成 → `ALLOWED_ORIGIN` 設定 → `wrangler secret put EXPORT_TOKEN` → `wrangler deploy`）。
+`/api/export?key=...` は CSV を出力（β・MRS・決定的瞬間の列を含む。自由記述は式インジェクション対策済み）。
