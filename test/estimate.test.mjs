@@ -37,6 +37,9 @@ test("決定的瞬間と品質を返す", () => {
   const r = E.estimate(data.questions, data.meta, ans2);
   const ex = E.extras(data.questions, data.meta, ans2, r);
   assert.ok(ex.decisive.most_hesitated_qid, "悩んだ設問IDがある");
+  const mainIds = new Set(data.questions.filter(q=>q.scored).map(q=>q.id));
+  assert.ok(mainIds.has(ex.decisive.most_hesitated_qid), "悩んだ設問は本番設問");
+  assert.ok(ex.quality.logit_count_divergence>=0 && ex.quality.logit_count_divergence<=1, "乖離は0〜1");
   assert.equal(typeof ex.quality.dominant_passed, "boolean");
   assert.ok(ex.verbal.keep.length>=1 && ex.verbal.tradeable.length>=1);
 });
