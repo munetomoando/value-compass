@@ -118,7 +118,8 @@ async function handleExport(url, env) {
     cursor = list.list_complete ? undefined : list.cursor;
   } while (cursor);
 
-  const csv = toCsv(records);
+  // 先頭に UTF-8 BOM を付与（Excel が Shift-JIS と誤認して日本語が文字化けするのを防ぐ）
+  const csv = "﻿" + toCsv(records);
   return new Response(csv, {
     status: 200,
     headers: {
