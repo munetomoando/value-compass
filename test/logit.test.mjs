@@ -16,7 +16,7 @@ test("既知の係数を概ね回復する", () => {
   const beta = fitLogit(X, y, { lambda:0.01, penalizeIntercept:false });
   assert.ok(Math.abs(beta[1]-0.8)<0.3, `x1 ${beta[1]}`);
   assert.ok(Math.abs(beta[2]-1.5)<0.4, `x2 ${beta[2]}`);
-  assert.ok(beta[3]>0.5, `x3 ${beta[3]}`);
+  assert.ok(Math.abs(beta[3]-1.0)<0.4, `x3 ${beta[3]}`);
 });
 
 test("完全分離でも有限の係数を返す（リッジ）", () => {

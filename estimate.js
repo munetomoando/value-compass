@@ -12,7 +12,7 @@
     for(let c=0;c<n;c++){
       let piv=c; for(let r=c+1;r<n;r++) if(Math.abs(M[r][c])>Math.abs(M[piv][c])) piv=r;
       [M[c],M[piv]]=[M[piv],M[c]];
-      const d=M[c][c]||1e-9;
+      const d = (Number.isFinite(M[c][c]) && M[c][c] !== 0) ? M[c][c] : 1e-9;
       for(let j=c;j<=n;j++) M[c][j]/=d;
       for(let r=0;r<n;r++){ if(r===c) continue; const f=M[r][c];
         for(let j=c;j<=n;j++) M[r][j]-=f*M[c][j]; }
@@ -22,12 +22,14 @@
 
   // 罰則付き二項ロジットの最尤（Newton-Raphson / IRLS）
   function fitLogit(X, y, opts){
+    if (!X || X.length === 0) throw new Error("fitLogit: X must be non-empty");
     opts = opts || {};
     const lambda = opts.lambda==null ? 0.5 : opts.lambda;
     const penalizeIntercept = !!opts.penalizeIntercept;
     const maxIter = opts.maxIter || 50;
     const p = X[0].length;
     let beta = new Array(p).fill(0);
+    let converged = false;
     for(let it=0; it<maxIter; it++){
       const g = new Array(p).fill(0);            // 勾配
       const H = Array.from({length:p},()=>new Array(p).fill(0)); // -ヘッセ
@@ -45,8 +47,9 @@
       }
       const step = solve(H, g);
       let maxd=0; for(let j=0;j<p;j++){ beta[j]+=step[j]; maxd=Math.max(maxd,Math.abs(step[j])); }
-      if(maxd<1e-7) break;
+      if(maxd<1e-7){ converged=true; break; }
     }
+    if(!converged) console.warn("fitLogit: 収束しませんでした (maxIter到達)");
     return beta;
   }
 
