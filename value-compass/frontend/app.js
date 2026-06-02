@@ -163,13 +163,11 @@
     const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) { advance(); return; }
 
-    const stage = $("#q-stage");
     setTimeout(function () {
       const content = $("#q-content");
       content.classList.remove("page-turn");
       content.classList.add("page-out"); // めくれて消える
       setTimeout(advance, 240);
-      void stage; // 参照保持（将来の拡張用）
     }, 160);
   }
 
@@ -227,7 +225,7 @@
 
     const cards = [
       { kicker:"DISCOVERY 1 / 5", title:"あなたの重視度コンパス",
-        html:`<p class="lead">${answers.filter(a=>{const q=qById[a.q_id];return q&&q.scored;}).length}回の選択から、各条件の重みを推定しました。外側ほど重視しています。</p><div class="radar-wrap">${radarSVG}</div>` },
+        html:`<p class="lead">${answers.filter(ans=>{const q=qById[ans.q_id];return q&&q.scored;}).length}回の選択から、各条件の重みを推定しました。外側ほど重視しています。</p><div class="radar-wrap">${radarSVG}</div>` },
       { kicker:"DISCOVERY 2 / 5", title:"お金に換算すると",
         html:`<p class="lead">あなたの選択を年収（30歳頃・額面）に換算しました。</p><div class="money">${moneyRows}</div>${incNote}` },
       { kicker:"DISCOVERY 3 / 5", title:"決定的だった瞬間",
