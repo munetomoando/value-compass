@@ -53,5 +53,58 @@
     return beta;
   }
 
-  return { fitLogit, solve };
+  // 属性値→数値（incomeは100万単位、二値はgood=1/bad=0、subjectiveは名目good=1）
+  function code(meta, attr, val){
+    const def = meta.attributes[attr];
+    if(attr==="income") return (+val)/100;
+    const good = def.good || def.good_nominal;
+    return val===good ? 1 : 0;
+  }
+
+  function designRow(meta, q){
+    return meta.attribute_order.map(a => code(meta,a,q.A[a]) - code(meta,a,q.B[a]));
+  }
+
+  function std(arr){
+    const m=arr.reduce((a,b)=>a+b,0)/arr.length;
+    return Math.sqrt(arr.reduce((s,x)=>s+(x-m)*(x-m),0)/arr.length);
+  }
+
+  function estimate(questions, meta, answers){
+    const ansById = {}; answers.forEach(a=>ansById[a.q_id]=a);
+    const mains = questions.filter(q=>q.scored);
+    const order = meta.attribute_order;
+
+    const Xdiff=[], X=[], y=[];
+    for(const q of mains){
+      const a=ansById[q.id]; if(!a) continue;
+      const d=designRow(meta,q);
+      Xdiff.push(d); X.push([1,...d]); y.push(a.choice==="A"?1:0);
+    }
+    const beta_full = fitLogit(X, y, { lambda:0.5, penalizeIntercept:false });
+    const beta = {}; order.forEach((a,i)=> beta[a]=beta_full[i+1]); // 切片を除く
+
+    // 重要度（スケール非依存）= |β_k| * sd(差分列_k)、最大1に正規化
+    const imp={};
+    order.forEach((a,i)=>{ imp[a]=Math.abs(beta[a])*std(Xdiff.map(r=>r[i])); });
+    const maxImp=Math.max(...Object.values(imp),1e-9);
+    const importance={}; order.forEach(a=> importance[a]=imp[a]/maxImp);
+    const importance_rank = order.slice().sort((p,q)=>importance[q]-importance[p]);
+
+    // MRS（万円）= β_attr/β_income * 100。年収軽視時はnull、極端値はクリップ
+    const bInc = beta.income;
+    const mrs_manyen={};
+    for(const a of order){
+      if(a==="income") continue;
+      if(!Number.isFinite(bInc) || Math.abs(bInc)<0.02){ mrs_manyen[a]=null; continue; }
+      let v=(beta[a]/bInc)*100;
+      if(!Number.isFinite(v)){ mrs_manyen[a]=null; continue; }
+      mrs_manyen[a]=Math.max(-500,Math.min(500, Math.round(v/5)*5));
+    }
+
+    return { beta, importance, importance_rank, mrs_manyen,
+             _design:{ Xdiff, beta_full, mainsIds: mains.map(q=>q.id) } };
+  }
+
+  return { fitLogit, solve, estimate, designRow, code };
 });
