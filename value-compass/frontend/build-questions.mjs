@@ -1,7 +1,15 @@
 import { writeFileSync } from "node:fs";
 
-// 決定論PRNG（mulberry32）
-function rng(seed){ return function(){ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+// 決定論PRNG — mulberry32 アルゴリズム
+function rng(seed){
+  return function(){
+    seed |= 0;
+    seed  = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t     = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
 
 const META = {
   app_version: "0.2",
@@ -64,10 +72,10 @@ function penalty(mains){
   let pen=0;
   for(const k of BIN_KEYS){
     const n = mains.filter(q=>q.A[k]!==q.B[k]).length;
-    const target=11; pen += Math.abs(n-target);
+    const target=11; pen += Math.abs(n-target); // 16問中 ~11問で各2値属性が分岐するのが目標
   }
   const incBranch = mains.filter(q=>q.A.income!==q.B.income).length;
-  pen += Math.abs(incBranch-13);
+  pen += Math.abs(incBranch-13); // 年収は分岐しやすいため目標を ~13 に設定
   const cnt = Object.fromEntries(INCOME.map(v=>[v,0]));
   for(const q of mains){ cnt[q.A.income]++; cnt[q.B.income]++; }
   const avg = (16*2)/4;
@@ -78,12 +86,12 @@ function penalty(mains){
 function buildMains(seed){
   const r=rng(seed);
   let best=null, bestPen=Infinity;
-  for(let restart=0; restart<4000; restart++){
+  for(let attempt=0; attempt<4000; attempt++){
     const mains=[];
     for(let i=0;i<16;i++){ const p=makePair(r); if(p) mains.push(p); }
     if(mains.length<16) continue;
     const pen=penalty(mains);
-    if(pen<bestPen){ bestPen=pen; best=mains; if(pen<=6) break; }
+    if(pen<bestPen){ bestPen=pen; best=mains; if(pen<=6) break; } // pen<=6 で十分な品質と判断して早期終了
   }
   return { mains:best, pen:bestPen };
 }

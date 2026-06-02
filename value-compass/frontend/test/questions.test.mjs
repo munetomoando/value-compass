@@ -40,4 +40,5 @@ test("支配選択qdはAが全属性で良い", () => {
   const GOOD = { location:"なし", hours:"少", remote:"可", growth:"大", stability:"安定" };
   assert.ok(+q.A.income > +q.B.income);
   for (const a of ["location","hours","remote","growth","stability"]) assert.equal(q.A[a], GOOD[a]);
+  assert.equal(q.scored, false);
 });
