@@ -122,26 +122,6 @@ button { font-family: inherit; cursor: pointer; }
 .transition-card p { font-size: 16px; }
 .transition-card .primary { max-width: 320px; margin: 22px auto 0; }
 
-/* 結果 */
-#result-text { font-size: 16px; }
-.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
-.cols .box { border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
-.cols .box h4 { margin: 0 0 8px; font-size: 14px; }
-.cols .box.keep h4 { color: var(--good); }
-.cols .box.trade h4 { color: var(--muted); }
-.cols ul { margin: 0; padding-left: 18px; font-size: 14px; }
-@media (max-width: 560px) { .cols { grid-template-columns: 1fr; } }
-
-.score-row { display: flex; align-items: center; gap: 10px; margin: 7px 0; }
-.score-label { width: 96px; font-size: 13px; color: var(--muted); flex-shrink: 0; }
-.score-track { flex: 1; height: 10px; background: var(--line); border-radius: 6px; overflow: hidden; }
-.score-fill { display: block; height: 100%; background: var(--accent); }
-.score-num { width: 30px; text-align: right; font-size: 13px; color: var(--muted); }
-
-#quality-note { display: none; background: #fdeede; color: var(--warn); padding: 10px 14px;
-  border-radius: 8px; font-size: 13px; margin-top: 12px; }
-
-
 /* 確認画面 */
 .likert { display: flex; justify-content: space-between; gap: 6px; margin: 12px 0 6px; }
 .likert label { flex: 1; text-align: center; font-size: 12px; color: var(--muted); cursor: pointer; }
@@ -209,4 +189,4 @@ footer.app-foot { text-align: center; color: var(--muted); font-size: 12px; marg
 .reveal-box{background:#eaf1ff;border-radius:12px;padding:16px;font-size:14px;}
 .quality-note{display:none;background:#fdeede;color:var(--warn);padding:10px 14px;border-radius:8px;font-size:13px;margin-top:12px;}
 @media (max-width:560px){ .cols{grid-template-columns:1fr;} }
-@media (prefers-reduced-motion: reduce){ .reveal-card.turn,.data-poly,.tradeoff-flash.show{animation:none;transition:none;} .data-poly{transform:scale(1);opacity:1;} }
+@media (prefers-reduced-motion: reduce){ .reveal-card.turn,.data-poly,.tradeoff-flash.show{animation:none;transition:none;} .data-poly{transform:scale(1);opacity:1;} .tradeoff-flash.show{opacity:1;} }
