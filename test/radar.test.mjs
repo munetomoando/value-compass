@@ -15,3 +15,14 @@ test("value=0でも例外を出さない", () => {
   const items=Array.from({length:6},(_,i)=>({label:"x"+i, value:0}));
   assert.doesNotThrow(()=>R.buildRadarSVG(items));
 });
+
+test("value>1はクランプされ value=1と同じSVGになる", () => {
+  const ones=Array.from({length:6},(_,i)=>({label:"x"+i, value:1}));
+  const twos=Array.from({length:6},(_,i)=>({label:"x"+i, value:2}));
+  assert.equal(R.buildRadarSVG(twos), R.buildRadarSVG(ones));
+});
+
+test("項目が少なすぎる場合は空SVGを返す（例外なし）", () => {
+  assert.doesNotThrow(()=>R.buildRadarSVG([]));
+  assert.match(R.buildRadarSVG([]), /<svg/);
+});
