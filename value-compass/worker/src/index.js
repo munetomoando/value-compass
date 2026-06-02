@@ -84,7 +84,12 @@ async function handleSubmit(request, env, origin) {
     scores: payload.scores || null,
     quality: payload.quality || null,
     feedback: payload.feedback || null,
-    app_version: payload.app_version || null
+    app_version: payload.app_version || null,
+    estimate: payload.estimate || null,
+    counts: payload.counts || null,
+    decisive: payload.decisive || null,
+    framing: payload.framing || null,
+    question_order: payload.question_order || null
   };
 
   await env.LOGS.put("session:" + sessionId, JSON.stringify(record));
@@ -134,17 +139,25 @@ function toCsv(records) {
   const header = [
     "session_id", "timestamp", "received_at", "app_version",
     ...ATTR_ORDER.map((a) => "score_" + a),
+    ...ATTR_ORDER.map((a) => "beta_" + a),
+    ...ATTR_ORDER.filter(a => a !== "income").map((a) => "mrs_" + a),
+    "most_hesitated_qid", "fastest_qid", "logit_count_divergence",
     "dominant_passed", "min_response_ms", "consistency_flags",
     "agreement", "free_text", "answers_json"
   ];
 
   const rows = records.map((r) => {
-    const scores = r.scores || {};
+    const scores = r.scores || r.counts || {};
     const quality = r.quality || {};
     const feedback = r.feedback || {};
     return [
       r.session_id, r.timestamp, r.received_at, r.app_version,
       ...ATTR_ORDER.map((a) => (a in scores ? scores[a] : "")),
+      ...ATTR_ORDER.map(a => (r.estimate && r.estimate.beta && a in r.estimate.beta) ? r.estimate.beta[a] : ""),
+      ...ATTR_ORDER.filter(a => a !== "income").map(a => (r.estimate && r.estimate.mrs_manyen && a in r.estimate.mrs_manyen) ? r.estimate.mrs_manyen[a] : ""),
+      (r.decisive && r.decisive.most_hesitated_qid) || "",
+      (r.decisive && r.decisive.fastest_qid) || "",
+      (r.quality && r.quality.logit_count_divergence != null) ? r.quality.logit_count_divergence : "",
       quality.dominant_passed, quality.min_response_ms, quality.consistency_flags,
       feedback.agreement, feedback.free_text,
       JSON.stringify(r.answers || [])
