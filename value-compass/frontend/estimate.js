@@ -130,7 +130,7 @@
     const zg=zscores(gaps), zt=zscores(times);
     let hi=0, lo=0;
     ids.forEach((_,i)=>{ if((zt[i]-zg[i])>(zt[hi]-zg[hi])) hi=i; if((zg[i]-zt[i])>(zg[lo]-zt[lo])) lo=i; });
-    const decisive = { most_hesitated_qid: ids[hi]||null, fastest_qid: ids[lo]||null };
+    const decisive = { most_hesitated_qid: ids[hi]||null, fastest_qid: ids.length>=2 ? ids[lo] : null };
 
     // 品質：支配選択passed、最小応答時間、ロジット×カウント乖離
     const dom = questions.find(q=>q.type==="dominant");
@@ -147,20 +147,23 @@
         if(a.choice===bs) good++; });
       counts[attr]= rel?good/rel:0.5;
     });
-    const cRank=meta.attribute_order.slice().sort((p,q)=>Math.abs(counts[q]-0.5)-Math.abs(counts[p]-0.5));
+    const cRank=meta.attribute_order.slice().sort((a,b)=>Math.abs(counts[b]-0.5)-Math.abs(counts[a]-0.5));
     let div=0; est.importance_rank.forEach((a,i)=> div+=Math.abs(i-cRank.indexOf(a)));
-    const logit_count_divergence = +(div/(meta.attribute_order.length*meta.attribute_order.length)).toFixed(2);
+    const n = meta.attribute_order.length;
+    const maxDiv = Math.floor(n*n/2); // 完全逆順での順位差合計（n=6→18）
+    const logit_count_divergence = +(div/maxDiv).toFixed(2); // 0=一致, 1=完全逆順
 
     // 言語化：上位2=譲れない、下位2=出しやすい
     const label={income:"年収",location:"勤務地（転勤の少なさ）",hours:"労働時間の短さ",remote:"在宅勤務",growth:"裁量・成長機会",stability:"雇用の安定性"};
+    const lab = a => label[a] || (meta.attributes[a] && meta.attributes[a].label) || a;
     const dir={};
     if(Number.isFinite(est.beta.growth)) dir.growth = est.beta.growth>=0?"裁量・成長を取りにいく傾向":"言われた業務でも安定を選ぶ傾向";
     if(Number.isFinite(est.beta.stability)) dir.stability = est.beta.stability>=0?"雇用の安定を重視する傾向":"不安定でも成長機会を取る傾向";
     const ranked=est.importance_rank;
-    const phrase=a=> (a==="growth"&&dir.growth)?`${label[a]}（${dir.growth}）`:(a==="stability"&&dir.stability)?`${label[a]}（${dir.stability}）`:label[a];
+    const phrase=a=> (a==="growth"&&dir.growth)?`${lab(a)}（${dir.growth}）`:(a==="stability"&&dir.stability)?`${lab(a)}（${dir.stability}）`:lab(a);
     const keep=ranked.slice(0,2).map(phrase);
     const tradeable=ranked.slice(-2).map(phrase);
-    const text=`あなたの選択からは、**${phrase(ranked[0])}**と**${phrase(ranked[1])}**を特に重視する傾向が読み取れました。一方で**${label[ranked[ranked.length-1]]}**は相対的に優先度が低く、他条件と引き換えに手放す選択が目立ちました。`;
+    const text=`あなたの選択からは、**${phrase(ranked[0])}**と**${phrase(ranked[1])}**を特に重視する傾向が読み取れました。一方で**${lab(ranked[ranked.length-1])}**は相対的に優先度が低く、他条件と引き換えに手放す選択が目立ちました。`;
 
     return { decisive, quality:{ dominant_passed, min_response_ms, logit_count_divergence }, counts, verbal:{ text, keep, tradeable, direction:dir, label } };
   }
