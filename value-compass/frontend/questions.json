@@ -1,88 +1,477 @@
 {
   "meta": {
-    "app_version": "0.1",
-    "attributes": {
-      "income":    { "label": "年収",        "levels": { "300": "年収300万", "450": "年収450万", "600": "年収600万" }, "good": "max" },
-      "location":  { "label": "勤務地・転勤", "levels": { "なし": "転勤なし・地元", "あり": "転勤あり・全国" }, "good": "なし" },
-      "hours":     { "label": "労働時間",     "levels": { "少": "残業少（〜月10h）", "多": "残業多（〜月45h）" }, "good": "少" },
-      "remote":    { "label": "在宅勤務",     "levels": { "可": "在宅可", "不可": "出社のみ" }, "good": "可" },
-      "growth":    { "label": "成長・裁量",   "levels": { "大": "裁量大・成長機会多", "小": "言われた業務中心" }, "good_nominal": "大", "subjective": true },
-      "stability": { "label": "雇用安定性",   "levels": { "安定": "安定（大手・終身的）", "不安定": "成長ベンチャー（不安定）" }, "good_nominal": "安定", "subjective": true }
+    "app_version": "0.2",
+    "framing": {
+      "income_anchor": "age30_gross",
+      "family_assumption": "none_current_self",
+      "note": "年収はその仕事に就いた30歳頃の額面。転勤・在宅などはその仕事がずっと持つ特徴。特定の家族構成は仮定せず、今のあなたの感覚で。"
     },
-    "attribute_order": ["income", "location", "hours", "remote", "growth", "stability"]
+    "attributes": {
+      "income": {
+        "label": "年収",
+        "unit": "万円",
+        "levels": {
+          "300": "年収300万",
+          "450": "年収450万",
+          "600": "年収600万",
+          "750": "年収750万"
+        },
+        "kind": "continuous",
+        "good": "max"
+      },
+      "location": {
+        "label": "勤務地・転勤",
+        "levels": {
+          "なし": "転勤なし・地元",
+          "あり": "転勤あり・全国"
+        },
+        "kind": "binary",
+        "good": "なし"
+      },
+      "hours": {
+        "label": "労働時間",
+        "levels": {
+          "少": "残業少（〜月10h）",
+          "多": "残業多（〜月45h）"
+        },
+        "kind": "binary",
+        "good": "少"
+      },
+      "remote": {
+        "label": "在宅勤務",
+        "levels": {
+          "可": "在宅可",
+          "不可": "出社のみ"
+        },
+        "kind": "binary",
+        "good": "可"
+      },
+      "growth": {
+        "label": "成長・裁量",
+        "levels": {
+          "大": "裁量大・成長機会多",
+          "小": "言われた業務中心"
+        },
+        "kind": "binary",
+        "good_nominal": "大",
+        "subjective": true
+      },
+      "stability": {
+        "label": "雇用安定性",
+        "levels": {
+          "安定": "安定（大手・終身的）",
+          "不安定": "成長ベンチャー（不安定）"
+        },
+        "kind": "binary",
+        "good_nominal": "安定",
+        "subjective": true
+      }
+    },
+    "attribute_order": [
+      "income",
+      "location",
+      "hours",
+      "remote",
+      "growth",
+      "stability"
+    ]
   },
   "questions": [
     {
-      "id": "practice", "type": "practice", "scored": false,
-      "intent": "操作に慣れる。属性差が分かりやすい",
-      "A": { "income": "450", "location": "なし", "hours": "少", "remote": "可",   "growth": "小", "stability": "安定" },
-      "B": { "income": "450", "location": "あり", "hours": "多", "remote": "不可", "growth": "大", "stability": "不安定" }
+      "id": "practice",
+      "type": "practice",
+      "scored": false,
+      "intent": "操作に慣れる",
+      "A": {
+        "income": "450",
+        "location": "なし",
+        "hours": "少",
+        "remote": "可",
+        "growth": "小",
+        "stability": "安定"
+      },
+      "B": {
+        "income": "450",
+        "location": "あり",
+        "hours": "多",
+        "remote": "不可",
+        "growth": "大",
+        "stability": "不安定"
+      }
     },
     {
-      "id": "q1", "type": "main", "scored": true,
-      "intent": "年収＋裁量 vs 生活条件＋安定",
-      "A": { "income": "600", "location": "あり", "hours": "多", "remote": "不可", "growth": "大", "stability": "不安定" },
-      "B": { "income": "450", "location": "なし", "hours": "少", "remote": "可",   "growth": "小", "stability": "安定" }
+      "id": "q01",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "750",
+        "location": "あり",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "不安定"
+      },
+      "B": {
+        "income": "750",
+        "location": "なし",
+        "hours": "多",
+        "remote": "可",
+        "growth": "小",
+        "stability": "不安定"
+      }
     },
     {
-      "id": "q2", "type": "main", "scored": true,
-      "intent": "同年収で条件のみ対立。年収を抜いた純粋比較",
-      "A": { "income": "450", "location": "なし", "hours": "多", "remote": "可",   "growth": "大", "stability": "不安定" },
-      "B": { "income": "450", "location": "あり", "hours": "少", "remote": "不可", "growth": "小", "stability": "安定" }
+      "id": "q02",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "300",
+        "location": "なし",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "不安定"
+      },
+      "B": {
+        "income": "750",
+        "location": "なし",
+        "hours": "多",
+        "remote": "可",
+        "growth": "小",
+        "stability": "安定"
+      }
     },
     {
-      "id": "q3", "type": "main", "scored": true,
-      "intent": "高年収＋安定 vs 自由＋成長。年収の重みを測る",
-      "A": { "income": "600", "location": "なし", "hours": "多", "remote": "不可", "growth": "小", "stability": "安定" },
-      "B": { "income": "300", "location": "あり", "hours": "少", "remote": "可",   "growth": "大", "stability": "不安定" }
+      "id": "q03",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "600",
+        "location": "なし",
+        "hours": "多",
+        "remote": "可",
+        "growth": "大",
+        "stability": "安定"
+      },
+      "B": {
+        "income": "750",
+        "location": "なし",
+        "hours": "多",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "安定"
+      }
     },
     {
-      "id": "q4", "type": "main", "scored": true,
-      "intent": "年収を捨てて時間・在宅・裁量を取るか",
-      "A": { "income": "450", "location": "あり", "hours": "少", "remote": "可",   "growth": "大", "stability": "安定" },
-      "B": { "income": "600", "location": "なし", "hours": "多", "remote": "不可", "growth": "小", "stability": "不安定" }
+      "id": "q04",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "300",
+        "location": "なし",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "不安定"
+      },
+      "B": {
+        "income": "600",
+        "location": "あり",
+        "hours": "少",
+        "remote": "可",
+        "growth": "大",
+        "stability": "不安定"
+      }
     },
     {
-      "id": "q5", "type": "main", "scored": true,
-      "intent": "低年収でも生活の質を取るか。q3の逆構図",
-      "A": { "income": "300", "location": "なし", "hours": "少", "remote": "可",   "growth": "小", "stability": "安定" },
-      "B": { "income": "600", "location": "あり", "hours": "多", "remote": "不可", "growth": "大", "stability": "不安定" }
+      "id": "q05",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "450",
+        "location": "あり",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "不安定"
+      },
+      "B": {
+        "income": "600",
+        "location": "あり",
+        "hours": "多",
+        "remote": "不可",
+        "growth": "大",
+        "stability": "安定"
+      }
     },
     {
-      "id": "q6", "type": "main", "scored": true,
-      "intent": "転勤を固定し裁量/成長 vs 時間/在宅/安定",
-      "A": { "income": "450", "location": "なし", "hours": "多", "remote": "不可", "growth": "大", "stability": "不安定" },
-      "B": { "income": "450", "location": "なし", "hours": "少", "remote": "可",   "growth": "小", "stability": "安定" }
+      "id": "q06",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "300",
+        "location": "なし",
+        "hours": "多",
+        "remote": "可",
+        "growth": "大",
+        "stability": "安定"
+      },
+      "B": {
+        "income": "300",
+        "location": "なし",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "不安定"
+      }
     },
     {
-      "id": "q7", "type": "dominant", "scored": false,
-      "intent": "支配選択（注意チェック）。Aが全属性で優位。BならフラグL",
-      "A": { "income": "600", "location": "なし", "hours": "少", "remote": "可",   "growth": "大", "stability": "安定" },
-      "B": { "income": "300", "location": "あり", "hours": "多", "remote": "不可", "growth": "小", "stability": "不安定" }
+      "id": "q07",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "450",
+        "location": "あり",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "大",
+        "stability": "安定"
+      },
+      "B": {
+        "income": "300",
+        "location": "なし",
+        "hours": "少",
+        "remote": "可",
+        "growth": "小",
+        "stability": "不安定"
+      }
     },
     {
-      "id": "q8", "type": "main", "scored": true,
-      "intent": "残業を固定。年収＋在宅 vs 地元＋裁量＋安定",
-      "A": { "income": "300", "location": "なし", "hours": "少", "remote": "不可", "growth": "大", "stability": "安定" },
-      "B": { "income": "450", "location": "あり", "hours": "少", "remote": "可",   "growth": "小", "stability": "不安定" }
+      "id": "q08",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "450",
+        "location": "なし",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "安定"
+      },
+      "B": {
+        "income": "300",
+        "location": "あり",
+        "hours": "多",
+        "remote": "不可",
+        "growth": "大",
+        "stability": "不安定"
+      }
     },
     {
-      "id": "q9", "type": "main", "scored": true,
-      "intent": "高年収＋好条件＋不安定 vs 低年収＋安定＋成長",
-      "A": { "income": "600", "location": "あり", "hours": "少", "remote": "可",   "growth": "小", "stability": "不安定" },
-      "B": { "income": "300", "location": "なし", "hours": "多", "remote": "不可", "growth": "大", "stability": "安定" }
+      "id": "q09",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "750",
+        "location": "なし",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "大",
+        "stability": "不安定"
+      },
+      "B": {
+        "income": "300",
+        "location": "あり",
+        "hours": "少",
+        "remote": "可",
+        "growth": "小",
+        "stability": "不安定"
+      }
     },
     {
-      "id": "q10", "type": "main", "scored": true,
-      "intent": "中年収＋裁量＋安定 vs 在宅・地元",
-      "A": { "income": "450", "location": "あり", "hours": "少", "remote": "不可", "growth": "大", "stability": "安定" },
-      "B": { "income": "300", "location": "なし", "hours": "多", "remote": "可",   "growth": "小", "stability": "不安定" }
+      "id": "q10",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "600",
+        "location": "あり",
+        "hours": "多",
+        "remote": "可",
+        "growth": "大",
+        "stability": "不安定"
+      },
+      "B": {
+        "income": "300",
+        "location": "あり",
+        "hours": "少",
+        "remote": "可",
+        "growth": "小",
+        "stability": "安定"
+      }
     },
     {
-      "id": "q11", "type": "main", "scored": true,
-      "intent": "低年収でも自由・成長・安定を取るか",
-      "A": { "income": "300", "location": "あり", "hours": "少", "remote": "可",   "growth": "大", "stability": "安定" },
-      "B": { "income": "600", "location": "なし", "hours": "多", "remote": "不可", "growth": "小", "stability": "不安定" }
+      "id": "q11",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "450",
+        "location": "あり",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "安定"
+      },
+      "B": {
+        "income": "750",
+        "location": "なし",
+        "hours": "多",
+        "remote": "可",
+        "growth": "大",
+        "stability": "安定"
+      }
+    },
+    {
+      "id": "q12",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "600",
+        "location": "あり",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "不安定"
+      },
+      "B": {
+        "income": "750",
+        "location": "あり",
+        "hours": "多",
+        "remote": "可",
+        "growth": "小",
+        "stability": "安定"
+      }
+    },
+    {
+      "id": "q13",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "600",
+        "location": "あり",
+        "hours": "少",
+        "remote": "可",
+        "growth": "小",
+        "stability": "安定"
+      },
+      "B": {
+        "income": "450",
+        "location": "なし",
+        "hours": "多",
+        "remote": "可",
+        "growth": "大",
+        "stability": "安定"
+      }
+    },
+    {
+      "id": "q14",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "450",
+        "location": "なし",
+        "hours": "多",
+        "remote": "可",
+        "growth": "小",
+        "stability": "不安定"
+      },
+      "B": {
+        "income": "750",
+        "location": "なし",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "安定"
+      }
+    },
+    {
+      "id": "q15",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "600",
+        "location": "なし",
+        "hours": "多",
+        "remote": "不可",
+        "growth": "大",
+        "stability": "安定"
+      },
+      "B": {
+        "income": "450",
+        "location": "あり",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "不安定"
+      }
+    },
+    {
+      "id": "q16",
+      "type": "main",
+      "scored": true,
+      "intent": "トレードオフ",
+      "A": {
+        "income": "750",
+        "location": "あり",
+        "hours": "少",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "不安定"
+      },
+      "B": {
+        "income": "600",
+        "location": "なし",
+        "hours": "多",
+        "remote": "可",
+        "growth": "小",
+        "stability": "安定"
+      }
+    },
+    {
+      "id": "qd",
+      "type": "dominant",
+      "scored": false,
+      "intent": "注意チェック（Aが全優位）",
+      "A": {
+        "income": "750",
+        "location": "なし",
+        "hours": "少",
+        "remote": "可",
+        "growth": "大",
+        "stability": "安定"
+      },
+      "B": {
+        "income": "300",
+        "location": "あり",
+        "hours": "多",
+        "remote": "不可",
+        "growth": "小",
+        "stability": "不安定"
+      }
     }
   ]
 }
