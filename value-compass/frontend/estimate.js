@@ -56,6 +56,7 @@
   // 属性値→数値（incomeは100万単位、二値はgood=1/bad=0、subjectiveは名目good=1）
   function code(meta, attr, val){
     const def = meta.attributes[attr];
+    if(!def) return 0;
     if(attr==="income") return (+val)/100;
     const good = def.good || def.good_nominal;
     return val===good ? 1 : 0;
@@ -66,6 +67,7 @@
   }
 
   function std(arr){
+    if(!arr.length) return 0;
     const m=arr.reduce((a,b)=>a+b,0)/arr.length;
     return Math.sqrt(arr.reduce((s,x)=>s+(x-m)*(x-m),0)/arr.length);
   }
@@ -89,21 +91,22 @@
     order.forEach((a,i)=>{ imp[a]=Math.abs(beta[a])*std(Xdiff.map(r=>r[i])); });
     const maxImp=Math.max(...Object.values(imp),1e-9);
     const importance={}; order.forEach(a=> importance[a]=imp[a]/maxImp);
-    const importance_rank = order.slice().sort((p,q)=>importance[q]-importance[p]);
+    const importance_rank = order.slice().sort((a1,a2)=>importance[a2]-importance[a1]);
 
     // MRS（万円）= β_attr/β_income * 100。年収軽視時はnull、極端値はクリップ
     const bInc = beta.income;
     const mrs_manyen={};
     for(const a of order){
       if(a==="income") continue;
-      if(!Number.isFinite(bInc) || Math.abs(bInc)<0.02){ mrs_manyen[a]=null; continue; }
+      if(!Number.isFinite(bInc) || bInc<0.02){ mrs_manyen[a]=null; continue; } // β_income≦0は金額換算が無意味→null
       let v=(beta[a]/bInc)*100;
       if(!Number.isFinite(v)){ mrs_manyen[a]=null; continue; }
       mrs_manyen[a]=Math.max(-500,Math.min(500, Math.round(v/5)*5));
     }
 
     return { beta, importance, importance_rank, mrs_manyen,
-             _design:{ Xdiff, beta_full, mainsIds: mains.map(q=>q.id) } };
+             _design:{ Xdiff, beta_full, mainsIds: mains.map(q=>q.id) } // デバッグ用・外部仕様外
+           };
   }
 
   return { fitLogit, solve, estimate, designRow, code };
