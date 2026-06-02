@@ -20,8 +20,9 @@
     <section id="intro" class="screen active">
       <div class="card">
         <h2>はじめに</h2>
-        <p>これは、2つの仮想的な求人「A / B」のどちらで働きたいかを<strong>12回</strong>選んでいくアプリです。年収・勤務地・労働時間・在宅・裁量・安定性などの条件が同時に変わるので、「総合的にどちらがマシか」で選んでください。</p>
-        <p>あなたの選択の積み重ねから、<strong>どの条件を重視しているか</strong>を推定して言葉でお返しします。所要時間は約3〜6分です。</p>
+        <p>これは、2つの仮想的な求人「A / B」のどちらで働きたいかを繰り返し選んでいくアプリです（練習1問のあと、本番16問）。年収・勤務地・労働時間・在宅・裁量・安定性などの条件が同時に変わるので、「総合的にどちらがマシか」で選んでください。</p>
+        <p>あなたの選択の積み重ねから、<strong>どの条件を重視しているか</strong>を推定して言葉でお返しします。所要時間は約4〜7分です。</p>
+        <p class="framing">これから就く仕事として選んでください。年収はその仕事に就いた<strong>30歳頃の額面</strong>、転勤・在宅などは<strong>その仕事がずっと持つ特徴</strong>です。特定の家族構成は思い描かず、<strong>"今のあなた"の率直な感覚</strong>で選んでください。</p>
         <ul class="consent">
           <li>回答は<strong>匿名</strong>です。氏名・学籍番号など個人を特定する情報は取得しません。</li>
           <li>本アプリは機能改善のため、匿名の回答を分析することがあります。</li>
@@ -39,6 +40,7 @@
           <div id="q-badge"></div>
           <h2 id="q-title">どちらの求人で働きたいですか？</h2>
           <div id="choices"></div>
+          <div id="tradeoff-flash" class="tradeoff-flash" aria-live="polite"></div>
         </div>
       </div>
     </section>
@@ -50,48 +52,18 @@
         <h2>練習はここまでです</h2>
         <p class="transition-lead">ここからが<strong>本番</strong>です。</p>
         <p>いまの練習と<strong>同じ要領</strong>で、表示される求人 A / B のうち<br>「働きたい」と思うほうを選んでいってください。</p>
-        <p class="muted">全10問（途中に確認用の設問が1問入ります）。深く悩まず、直感で選んでかまいません。</p>
+        <p class="muted">全16問（途中に確認用の設問が1問入ります）。深く悩まず、直感で選んでかまいません。</p>
         <button id="begin-main-btn" class="primary">本番を始める</button>
       </div>
     </section>
 
     <!-- 5. 結果画面 -->
     <section id="result" class="screen">
-      <div class="card">
-        <h2>あなたの傾向</h2>
-        <p id="result-text"></p>
-
-        <div class="cols">
-          <div class="box keep">
-            <h4>譲りにくい条件</h4>
-            <ul id="keep-list"></ul>
-          </div>
-          <div class="box trade">
-            <h4>交換に出しやすい条件</h4>
-            <ul id="tradeable-list"></ul>
-          </div>
-        </div>
-
-        <h4 class="muted" style="margin:18px 0 6px;">重視度（選択の一貫性, 0〜100）</h4>
-        <div id="score-bars"></div>
-
-        <div id="quality-note">
-          注意チェックの設問で、明らかに条件の良い求人が選ばれませんでした。結果は参考程度にご覧ください。
-        </div>
-
-        <p style="margin-top:18px;">
-          <button id="reveal-btn" class="link-btn">いま行ったことの種明かしを見る</button>
-        </p>
-        <div id="reveal-box" class="reveal-box">
-          いま行ったのは<strong>離散選択実験（DCE: Discrete Choice Experiment）</strong>という手法です。
-          各設問で複数の条件を同時に動かすことで、口で言う重視度ではなく、実際の選択から各条件の重みを逆算しています。
-          「あなたは何を重視しますか？」と直接聞くと社会的に望ましい答えに寄りがちですが、トレードオフを迫ることでより素直な選好が表れます。
-        </div>
-
-        <div style="margin-top:18px;">
-          <button id="to-confirm-btn" class="primary">結果の確認に進む</button>
-        </div>
-      </div>
+      <div class="result-note">あなたの選択を読み解きました</div>
+      <div class="dots" id="reveal-dots"></div>
+      <div class="reveal-stage"><div class="reveal-card turn" id="reveal-card"></div></div>
+      <button id="reveal-next" class="primary">次の発見へ →</button>
+      <div id="quality-note" class="quality-note">注意チェックの設問で明らかに良い求人が選ばれませんでした。結果は参考程度にご覧ください。</div>
     </section>
 
     <!-- 6. 確認画面 -->
@@ -129,11 +101,12 @@
     </section>
 
     <footer class="app-foot">
-      価値観コンパス / ValueCompass — MVP v0.1 ｜ 安藤至大 (Munetomo Ando)
+      価値観コンパス / ValueCompass — v0.2 ｜ 安藤至大 (Munetomo Ando)
     </footer>
   </main>
 
   <script src="estimate.js"></script>
+  <script src="radar.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
