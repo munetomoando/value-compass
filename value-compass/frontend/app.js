@@ -221,7 +221,17 @@
 
     const dHi = ex.decisive.most_hesitated_qid, dLo = ex.decisive.fastest_qid;
     const qById = {}; DATA.questions.forEach(q=>qById[q.id]=q);
-    const qDesc = q=>{ if(!q) return ""; const f=j=>`年収${j.income}/${j.location==="なし"?"転勤なし":"転勤あり"}/${j.hours==="少"?"残業少":"残業多"}`; return `「${f(q.A)}」 vs 「${f(q.B)}」`; };
+    const qDesc = q=>{ if(!q) return "";
+      const f=j=>[
+        `年収${j.income}`,
+        j.location==="なし"?"転勤なし":"転勤あり",
+        j.hours==="少"?"残業少":"残業多",
+        j.remote==="可"?"在宅可":"出社",
+        j.growth==="大"?"裁量大":"裁量小",
+        j.stability==="安定"?"安定":"不安定"
+      ].join("・");
+      return `「${f(q.A)}」 vs 「${f(q.B)}」`;
+    };
 
     const cards = [
       { kicker:"DISCOVERY 1 / 5", title:"あなたの重視度コンパス",

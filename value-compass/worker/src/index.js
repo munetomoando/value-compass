@@ -139,11 +139,11 @@ function csvEscape(val) {
 function toCsv(records) {
   const header = [
     "session_id", "timestamp", "received_at", "app_version",
-    ...ATTR_ORDER.map((a) => "score_" + a),
+    ...ATTR_ORDER.map((a) => "count_" + a),
     ...ATTR_ORDER.map((a) => "beta_" + a),
     ...ATTR_ORDER.filter(a => a !== "income").map((a) => "mrs_" + a),
     "most_hesitated_qid", "fastest_qid", "logit_count_divergence",
-    "dominant_passed", "min_response_ms", "consistency_flags",
+    "dominant_passed", "min_response_ms",
     "agreement", "free_text", "answers_json"
   ];
 
@@ -159,7 +159,7 @@ function toCsv(records) {
       (r.decisive && r.decisive.most_hesitated_qid) || "",
       (r.decisive && r.decisive.fastest_qid) || "",
       (quality.logit_count_divergence != null) ? quality.logit_count_divergence : "",
-      quality.dominant_passed, quality.min_response_ms, quality.consistency_flags,
+      quality.dominant_passed, quality.min_response_ms,
       feedback.agreement, feedback.free_text,
       JSON.stringify(r.answers || [])
     ].map(csvEscape).join(",");
