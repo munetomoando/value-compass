@@ -7,7 +7,7 @@
 
   // ===== 設定 =====
   // Worker のエンドポイント。空文字なら送信せずローカル完結（フロント完結版）。
-  const SUBMIT_ENDPOINT = ""; // 例: "https://value-compass.<account>.workers.dev/api/submit"
+  const SUBMIT_ENDPOINT = "https://value-compass.ando-munetomo.workers.dev/api/submit";
 
   // ===== 状態 =====
   let DATA = null;        // questions.json
